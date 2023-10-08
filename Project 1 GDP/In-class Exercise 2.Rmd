@@ -1,0 +1,226 @@
+---
+Title: Inclass Exercise 2
+Author: Dora Xu
+Date: "2023-10-07"
+Output: pdf_document
+Editor_options:
+  Chunk_output_type: console
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+d <- read_csv("_DataPublic_/vdem/1984_2022/vdem_1984_2022_external.csv")
+view(d)
+```
+
+#1. Codebook lookup
+
+i. What indicators regarding the quality of education are available in the V-Dem datasets?
+A) Education 15+ (E) (e_peaveduc)
+B) Education inequality, Gini (E) (e_peedgini)
+
+ii. What are the data's coverage (i.e., for which countries and years do we have data?)
+A) For e_peaveduc, the coverage is 1820 - 2022.
+B) For e_peedgini, the coverage is 1850 - 2010.
+
+iii. What are their sources? Provide the link to least 1 source.
+Source: Clio Infra (clio-infra.eu), drawing on Mitchell (1998a, 1998b, 1998c), United States Census Bureau (2021), UNESCO, Földvári and van Leeuwen (2014), Leeuwen, van Leeuwen-Li, Földvári (2011), Leeuwen, van Leeuwen-Li, Földvári (2012a), Leeuwen, van Leeuwen-Li, Földvári (2012b), Didenko, Foldvari, van Leeuwen (2012).
+
+#2. Subset by columns.
+
+i. Create a dataset containing only the country-year identifiers and indicators of education quality.
+```{r}
+d_edu <-
+  d |>
+  select(country_name, year, e_peaveduc, e_peedgini)
+```
+
+ii. Rename the columns of education quality to make them informative.
+```{r}
+d_edu <-
+  d_edu |>
+  rename("Country" = "country_name", "Year" = "year","Edu_above_15" = "e_peaveduc", "Edu_inequality" = "e_peedgini")
+view(d_edu)
+```
+
+#3. Subset by rows.
+i. List 5 countries-years that have the highest education level among its population.
+```{r}
+d_edu |>
+  slice_max(order_by = Edu_above_15, n = 5)
+```
+
+ii. List 5 countries-years that suffer from the most severe inequality in education.
+```{r}
+d_edu |>
+  slice_max(order_by = Edu_inequality, n = 5)
+```
+
+#4. Summarize the data
+i. Check data availability: For which countries and years are the indicators of education quality available?
+```{r}
+d_edu |> 
+  mutate(N_15_missing = as.numeric(is.na(Edu_above_15), .after = Edu_above_15)) |> 
+  group_by(Country) |>
+  summarize(N_15_missing = sum(N_15_missing))
+
+d_edu |> 
+  mutate(N_15_missing = as.numeric(is.na(Edu_above_15), .after = Edu_above_15)) |> 
+  group_by(Year) |>
+  summarize(N_15_missing = sum(N_15_missing))
+```
+
+```{r}
+d_edu |> 
+  mutate(N_Ineq_missing = as.numeric(is.na(Edu_inequality), .after = Edu_inequality)) |> 
+  group_by(Country) |>
+  summarize(N_Ineq_missing = sum(N_Ineq_missing))
+
+d_edu |> 
+  mutate(N_Ineq_missing = as.numeric(is.na(Edu_inequality), .after = Edu_inequality)) |> 
+  group_by(Year) |>
+  summarize(N_Ineq_missing = sum(N_Ineq_missing))
+```
+
+ii. Create two types of country-level indicators of education quality
+
+ a. Average level of education quality from 1984 to 2022
+```{r}
+Edu_above_15_ave <-
+  d_edu |>
+  group_by(Country) |>
+  summarize(Edu_above_15_ave = mean(Edu_above_15, na.rm = TRUE))
+Edu_above_15_ave
+
+Edu_inequality_ave <-
+  d_edu |>
+  group_by(Country) |>
+  summarize(Edu_inequality_ave = mean(Edu_inequality, na.rm = TRUE))
+Edu_inequality_ave
+```
+
+ b. Change of education quality from 1984 to 2022
+```{r}
+d_edu |>
+  filter(Year >= 1984, Year <= 2022) |>
+  group_by(Country) |>
+  arrange(Year) |>
+  summarize(Edu_change_above_15 = (last(Edu_above_15) - first(Edu_above_15))/ first(Edu_above_15)) |>
+  ungroup() |>
+  arrange(Country, Edu_change_above_15)
+
+d_edu |>
+  group_by(Country) |>
+  arrange(Year) |>
+  mutate (Edu_year_dev_above_15 = (Edu_above_15 - lag(Edu_above_15, n = 1))/lag(Edu_above_15, n = 1))|>
+  ungroup() |>
+  arrange(Country, Year)
+```
+
+```{r}
+d_edu |>
+  filter(Year >= 1984, Year <= 2010) |>
+  group_by(Country) |>
+  arrange(Year) |>
+  summarize(Edu_change_inequality = (last(Edu_inequality) - first(Edu_inequality))/ first(Edu_inequality)) |>
+  ungroup() |>
+  arrange(Country, Edu_change_inequality)
+
+d_edu |>
+  group_by(Country) |>
+  arrange(Year) |>
+  mutate (Edu_year_dev_inequality = (Edu_inequality - lag(Edu_inequality, n = 1))/lag(Edu_inequality, n = 1))|>
+  ungroup() |>
+  arrange(Country, Year)
+```
+
+iii. Examine the data and briefly discuss: Which countries perform the best and the worst in terms of education quality in the past four decades?
+
+Very simple presumption:
+A) The higher the Edu_above_15, the better.
+B) The lower the Edu_inequality, the better.
+
+Here, I sort out the best-performing countries based on
+1. having the top education above 15 year-length IN AVERAGE;
+```{r}
+Edu_above_15_ave |>
+  slice_max(order_by = Edu_above_15_ave, n = 5)
+```
+2. having the most growth in the education above 15 year-length (despite the possible short length at the beginning);
+```{r}
+Edu_change_above_15 <-
+  d_edu |>
+  filter(Year >= 1984, Year <= 2022) |>
+  group_by(Country) |>
+  arrange(Year) |>
+  summarize(Edu_change_above_15 = (last(Edu_above_15) - first(Edu_above_15))/ first(Edu_above_15)) |>
+  ungroup() |>
+  arrange(Country, Edu_change_above_15)
+Edu_change_above_15 |>
+  slice_max(order_by = Edu_change_above_15, n = 5)
+```
+3. having the lowest education inequality IN AVERAGE;
+```{r}
+Edu_inequality_ave |>
+  slice_min(order_by = Edu_inequality_ave, n = 5)
+```
+and 4. having the most drop in the education inequality over time(despite the possible high inequality at the start).
+```{r}
+Edu_change_inequality <-
+  d_edu |>
+  filter(Year >= 1984, Year <= 2010) |>
+  group_by(Country) |>
+  arrange(Year) |>
+  summarize(Edu_change_inequality = (last(Edu_inequality) - first(Edu_inequality))/ first(Edu_inequality)) |>
+  ungroup() |>
+  arrange(Country, Edu_change_inequality)
+Edu_change_inequality |>
+  slice_max(order_by = Edu_change_inequality, n = 5)
+```
+
+Vice versa, the worst performing countries are selected based on
+1. having the shortest education above 15 year-length IN AVERAGE;
+```{r}
+Edu_above_15_ave |>
+  slice_min(order_by = Edu_above_15_ave, n = 5)
+```
+2. having the least growth in the education above 15 year-length (despite the possible long length at the beginning);
+```{r}
+Edu_change_above_15 <-
+  d_edu |>
+  filter(Year >= 1984, Year <= 2022) |>
+  group_by(Country) |>
+  arrange(Year) |>
+  summarize(Edu_change_above_15 = (last(Edu_above_15) - first(Edu_above_15))/ first(Edu_above_15)) |>
+  ungroup() |>
+  arrange(Country, Edu_change_above_15)
+Edu_change_above_15 |>
+  slice_min(order_by = Edu_change_above_15, n = 5)
+```
+3. having the highest education inequality IN AVERAGE;
+```{r}
+Edu_inequality_ave |>
+  slice_max(order_by = Edu_inequality_ave, n = 5)
+```
+and 4. having the least drop in the education inequality over time (despite the possible low inequality at the start).
+```{r}
+Edu_change_inequality <-
+  d_edu |>
+  filter(Year >= 1984, Year <= 2010) |>
+  group_by(Country) |>
+  arrange(Year) |>
+  summarize(Edu_change_inequality = (last(Edu_inequality) - first(Edu_inequality))/ first(Edu_inequality)) |>
+  ungroup() |>
+  arrange(Country, Edu_change_inequality)
+Edu_change_inequality |>
+  slice_min(order_by = Edu_change_inequality, n = 5)
+```
+
+A very brief conclusion:
+A) Best performing countries include: Switzerland, Germany, and the United Kingdom.
+B) Worst performing countries include: Burkina Faso, Niger and Mali.

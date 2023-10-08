@@ -1,0 +1,60 @@
+---
+title: "0921 R Class 3"
+author: "Dora Xu"
+date: "2023-09-21"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+## Level 1 heading
+
+### Level 2 heading
+
+#### Level 3 heading
+
+```{r cars}
+summary(cars)
+```
+
+##Add code to your document
+
+```{r}
+1+1
+```
+
+```{r}
+1*9
+```
+##Output figures
+
+```{r}
+plot(1:10,1:10)
+```
+
+##Display Data
+```{r}
+cars
+```
+
+##In-line R code (?)
+Scientific research shows that 12223 + 12111 = `r 12223 + 11111 `
+
+##How to insert code chunk quickly?
+
+##Install tinytex
+```{r}
+#install.packages("tinytex")
+#tinytex::install_tinytex()
+```
+
+##R markdown runs everything again!
