@@ -29,7 +29,9 @@ A) For e_peaveduc, the coverage is 1820 - 2022.
 B) For e_peedgini, the coverage is 1850 - 2010.
 
 iii. What are their sources? Provide the link to least 1 source.
-Source: Clio Infra (clio-infra.eu), drawing on Mitchell (1998a, 1998b, 1998c), United States Census Bureau (2021), UNESCO, Földvári and van Leeuwen (2014), Leeuwen, van Leeuwen-Li, Földvári (2011), Leeuwen, van Leeuwen-Li, Földvári (2012a), Leeuwen, van Leeuwen-Li, Földvári (2012b), Didenko, Foldvari, van Leeuwen (2012).
+A) Source for e_peaveduc: Clio Infra (clio-infra.eu), drawing on Mitchell (1998a, 1998b, 1998c), United States Census Bureau (2021), UNESCO, Földvári and van Leeuwen (2014), Leeuwen, van Leeuwen-Li, Földvári (2011), Leeuwen, van Leeuwen-Li, Földvári (2012a), Leeuwen, van Leeuwen-Li, Földvári (2012b), Didenko, Foldvari, van Leeuwen (2012).
+B) Source for e_peedgini: Clio Infra (clio-infra.eu), drawing on Mitchell (1998a, 1998b, 1998c), United States Census Bureau (2021), UNESCO, Földvári and van Leeuwen (2010a), Leeuwen, van Leeuwen-Li, Földvári (2011), Leeuwen, van Leeuwen-Li, Földvári (2012a), Leeuwen, van Leeuwen-Li, Földvári (2012b), Didenko, Foldvari, van Leeuwen (2012).
+Link: van Leeuwen, B., van Leeuwen-Li, J. & Földvári, P. (2012b), ‘Educational Inequality’, Working Paper CLIO-INFRA . URL: https://www.clio-infra.eu/docs/Educational_Gini.docx
 
 #2. Subset by columns.
 
